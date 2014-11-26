@@ -4,7 +4,6 @@
 #include "ofBaseApp.h"
 #include "ofGLProgrammableRenderer.h"
 #include "ofAppRunner.h"
-#include "Poco/URI.h"
 
 #ifdef TARGET_LINUX
 	#include "ofIcon.h"
@@ -17,6 +16,7 @@
 	#endif
 	#include "GLFW/glfw3native.h"
 	#include <X11/Xatom.h>
+	#include "Poco/URI.h"
 #elif defined(TARGET_OSX)
 	#include <Cocoa/Cocoa.h>
 	#define GLFW_EXPOSE_NATIVE_COCOA
@@ -34,6 +34,7 @@
 ofBaseApp *	ofAppGLFWWindow::ofAppPtr;
 ofAppGLFWWindow	* ofAppGLFWWindow::instance;
 GLFWwindow* ofAppGLFWWindow::windowP = NULL;
+bool isBlockingMouse = false; // added
 
 void ofGLReadyCallback();
 
@@ -239,6 +240,7 @@ void ofAppGLFWWindow::setupOpenGL(int w, int h, int screenMode){
 
 //--------------------------------------------
 void ofAppGLFWWindow::exit_cb(GLFWwindow* windowP_){
+	OF_EXIT_APP(0);
 }
 
 //--------------------------------------------
@@ -254,6 +256,46 @@ void ofAppGLFWWindow::initializeWindow(){
 	glfwSetScrollCallback(windowP, scroll_cb);
 	glfwSetDropCallback(windowP, drop_cb);
 
+	// added
+	//isBlockingMouse = false;
+	glfwSetTouchCallback(windowP, touch_cb); 
+	glfwSetInputMode(windowP, GLFW_TOUCH, true);
+}
+
+void ofAppGLFWWindow::initTouch() {
+	if(!windowP) return;
+	glfwSetTouchCallback(windowP, touch_cb); // added!
+	glfwSetInputMode(windowP, GLFW_TOUCH, true);
+
+	glfwSetMouseButtonCallback(windowP, NULL);
+	glfwSetCursorPosCallback(windowP, NULL);
+	glfwSetScrollCallback(windowP, NULL);
+
+	ofLog() << "GLFW initialised touch callbacks, disabled mouse";
+}
+
+void ofAppGLFWWindow::initMouse() {
+	if(!windowP) return;
+	glfwSetTouchCallback(windowP, NULL); // added!
+	glfwSetInputMode(windowP, GLFW_TOUCH, false);
+
+	glfwSetMouseButtonCallback(windowP, mouse_cb);
+	glfwSetCursorPosCallback(windowP, motion_cb);
+	glfwSetScrollCallback(windowP, scroll_cb);
+
+	ofLog() << "GLFW initialised mouse callbacks, disabled touch";
+}
+
+int ofAppGLFWWindow::getIgnoringCursorMasking() {
+	if(!windowP) return -1;
+	int isIgnoringCursorMasking;
+	glfwGetIgnoreCursorMaskingHACK(windowP, &isIgnoringCursorMasking);
+	return isIgnoringCursorMasking;
+}
+
+void ofAppGLFWWindow::setIgnoreCursorMasking(int value) {
+	if(!windowP) return;
+	glfwSetIgnoreCursorMaskingHACK(windowP, value);
 }
 
 #ifdef TARGET_LINUX
@@ -292,16 +334,10 @@ void ofAppGLFWWindow::runAppViaInfiniteLoop(ofBaseApp * appPtr){
 	glfwMakeContextCurrent(windowP);
 
 	ofNotifySetup();
-	while(!glfwWindowShouldClose(windowP)){
+	while(true){
 		ofNotifyUpdate();
 		display();
 	}
-    glfwDestroyWindow(windowP);
-    glfwTerminate();
-}
-
-void ofAppGLFWWindow::windowShouldClose(){
-	glfwSetWindowShouldClose(windowP,1);
 }
 
 //------------------------------------------------------------
@@ -494,11 +530,6 @@ int ofAppGLFWWindow::getHeight()
 			return windowW * pixelScreenCoordScale;
 		}
 	}
-}
-
-//------------------------------------------------------------
-GLFWwindow* ofAppGLFWWindow::getGLFWWindow(){
-    return windowP;
 }
 
 //------------------------------------------------------------
@@ -790,7 +821,7 @@ void ofAppGLFWWindow::setFullscreen(bool fullscreen){
 		HWND hwnd = glfwGetWin32Window(windowP);
  
   		DWORD EX_STYLE = WS_EX_OVERLAPPEDWINDOW;
-		DWORD STYLE = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_SIZEBOX;
+		DWORD STYLE = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
  
 	  	ChangeDisplaySettings(0, 0);
 		SetWindowLong(hwnd, GWL_EXSTYLE, EX_STYLE);
@@ -831,7 +862,8 @@ ofOrientation ofAppGLFWWindow::getOrientation(){
 void ofAppGLFWWindow::exitApp(){
 	// Terminate GLFW
 	glfwTerminate();
-	std::exit(0);
+
+	OF_EXIT_APP(0);
 }
 
 //------------------------------------------------------------
@@ -873,6 +905,7 @@ void ofAppGLFWWindow::mouse_cb(GLFWwindow* windowP_, int button, int state, int 
     }
 #endif
 
+	//ofLog() << "mouse something: " << button;
 	switch(button){
 	case GLFW_MOUSE_BUTTON_LEFT:
 		button = OF_MOUSE_BUTTON_LEFT;
@@ -886,10 +919,10 @@ void ofAppGLFWWindow::mouse_cb(GLFWwindow* windowP_, int button, int state, int 
 	}
 
 	if (state == GLFW_PRESS) {
-		ofNotifyMousePressed(ofGetMouseX(), ofGetMouseY(), button);
+		ofNotifyMousePressed(ofGetMouseX()*instance->pixelScreenCoordScale, ofGetMouseY()*instance->pixelScreenCoordScale, button);
 		instance->buttonPressed=true;
 	} else if (state == GLFW_RELEASE) {
-		ofNotifyMouseReleased(ofGetMouseX(), ofGetMouseY(), button);
+		ofNotifyMouseReleased(ofGetMouseX()*instance->pixelScreenCoordScale, ofGetMouseY()*instance->pixelScreenCoordScale, button);
 		instance->buttonPressed=false;
 	}
 	instance->buttonInUse = button;
@@ -914,14 +947,63 @@ void ofAppGLFWWindow::scroll_cb(GLFWwindow* windowP_, double x, double y) {
 }
 
 //------------------------------------------------------------
-void ofAppGLFWWindow::drop_cb(GLFWwindow* windowP_, int numFiles, const char** dropString) {
+void ofAppGLFWWindow::drop_cb(GLFWwindow* window, int count, const char** names) {
+//void ofAppGLFWWindow::drop_cb(GLFWwindow* windowP_, const char* dropString) {
+
+
+	//string drop = dropString;
 	ofDragInfo drag;
-	drag.position.set(ofGetMouseX(), ofGetMouseY());
-	drag.files.resize(numFiles);
-	for(int i=0; i<(int)drag.files.size(); i++){
-		drag.files[i] = Poco::URI(dropString[i]).getPath();
+	drag.position.set(ofGetMouseX()*instance->pixelScreenCoordScale, ofGetMouseY()*instance->pixelScreenCoordScale);
+	//drag.files = ofSplitString(drop,"\n",true);
+	for (int i = 0;  i < count;  i++) {
+        printf("  %i: \"%s\"\n", i, names[i]);
+		drag.files.push_back(names[i]);
 	}
+#ifdef TARGET_LINUX
+	for(int i=0; i<(int)drag.files.size(); i++){
+		drag.files[i] = Poco::URI(drag.files[i]).getPath();
+	}
+#endif
 	ofNotifyDragEvent(drag);
+}
+
+void ofAppGLFWWindow::touch_cb(GLFWwindow* window, int touch, int action, double x, double y)
+{
+	//printf("Touched! id: %i, action: %i, %f, %f\nf", touch, action, x, y);
+
+	//if(!isBlockingMouse) isBlockingMouse = true;
+
+	ofTouchEventArgs args;
+	args.id = touch;
+	args.x  =x;
+	args.y = y;
+	if(action == GLFW_PRESS) {		
+		args.type = ofTouchEventArgs::down;
+		ofNotifyEvent(ofEvents().touchDown, args);
+	} else if(action == GLFW_MOVE) {
+		args.type = ofTouchEventArgs::move;
+		ofNotifyEvent(ofEvents().touchMoved, args);
+	} else if(action == GLFW_RELEASE) {
+		args.type = ofTouchEventArgs::up;
+		ofNotifyEvent(ofEvents().touchUp, args);
+	} else {
+		ofLog() << "What is this touch action?: " << action;
+	}
+
+	
+
+	/*switch (action)
+    {
+        case GLFW_PRESS:
+            return "pressed";
+        case GLFW_RELEASE:
+            return "released";
+        case GLFW_REPEAT:
+            return "repeated";
+        case GLFW_MOVE:
+            return "moved";
+    }*/
+  
 }
 
 //------------------------------------------------------------
@@ -930,9 +1012,8 @@ void ofAppGLFWWindow::error_cb(int errorCode, const char* errorDescription){
 }
 
 //------------------------------------------------------------
-void ofAppGLFWWindow::keyboard_cb(GLFWwindow* windowP_, int keycode, int scancode, unsigned int codepoint, int action, int mods) {
-	int key;
-	switch (keycode) {
+void ofAppGLFWWindow::keyboard_cb(GLFWwindow* windowP_, int key, int scancode, int action, int mods) {
+	switch (key) {
 		case GLFW_KEY_ESCAPE:
 			key = OF_KEY_ESC;
 			break;
@@ -1039,14 +1120,19 @@ void ofAppGLFWWindow::keyboard_cb(GLFWwindow* windowP_, int keycode, int scancod
 			key = OF_KEY_TAB;
 			break;   
 		default:
-			key = codepoint;
 			break;
 	}
 
+	//GLFW defaults to uppercase - OF users are used to lowercase
+    //we look and see if shift is being held to toggle upper/lowecase 
+	if( key >= 65 && key <= 90 && !ofGetKeyPressed(OF_KEY_SHIFT) ){
+		key += 32;
+	}
+
 	if(action == GLFW_PRESS || action == GLFW_REPEAT){
-		ofNotifyKeyPressed(key,keycode,scancode,codepoint);
+		ofNotifyKeyPressed(key);
 	}else if (action == GLFW_RELEASE){
-		ofNotifyKeyReleased(key,keycode,scancode,codepoint);
+		ofNotifyKeyReleased(key);
 	}
 }
 
