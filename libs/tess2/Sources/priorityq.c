@@ -31,8 +31,7 @@
 
 //#include "tesos.h"
 #include <stddef.h>
-#include <assert.h>
-#include "tesselator.h"
+#include "../Include/tesselator.h"
 #include "priorityq.h"
 
 
