@@ -59,8 +59,6 @@
 		6678E97619FEB2DF00C00581 /* ofSoundBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6678E97219FEB2DF00C00581 /* ofSoundBuffer.cpp */; };
 		6678E97719FEB2DF00C00581 /* ofSoundBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 6678E97319FEB2DF00C00581 /* ofSoundBuffer.h */; };
 		6678E97819FEB2DF00C00581 /* ofSoundUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 6678E97419FEB2DF00C00581 /* ofSoundUtils.h */; };
-		66EA462B17A6D396009BB12A /* ofxOpenALSoundPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 66EA462717A6D396009BB12A /* ofxOpenALSoundPlayer.cpp */; };
-		66EA462C17A6D396009BB12A /* ofxOpenALSoundPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 66EA462817A6D396009BB12A /* ofxOpenALSoundPlayer.h */; };
 		66EA462D17A6D396009BB12A /* SoundEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 66EA462917A6D396009BB12A /* SoundEngine.cpp */; };
 		66EA462E17A6D396009BB12A /* SoundEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 66EA462A17A6D396009BB12A /* SoundEngine.h */; };
 		671C0AF41770246200DF03B3 /* AVSoundPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 671C0AF01770246200DF03B3 /* AVSoundPlayer.h */; };
@@ -276,8 +274,6 @@
 		6678E97219FEB2DF00C00581 /* ofSoundBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofSoundBuffer.cpp; sourceTree = "<group>"; };
 		6678E97319FEB2DF00C00581 /* ofSoundBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofSoundBuffer.h; sourceTree = "<group>"; };
 		6678E97419FEB2DF00C00581 /* ofSoundUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofSoundUtils.h; sourceTree = "<group>"; };
-		66EA462717A6D396009BB12A /* ofxOpenALSoundPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxOpenALSoundPlayer.cpp; sourceTree = "<group>"; };
-		66EA462817A6D396009BB12A /* ofxOpenALSoundPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxOpenALSoundPlayer.h; sourceTree = "<group>"; };
 		66EA462917A6D396009BB12A /* SoundEngine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoundEngine.cpp; sourceTree = "<group>"; };
 		66EA462A17A6D396009BB12A /* SoundEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundEngine.h; sourceTree = "<group>"; };
 		6711091F19D3EAC6005D095F /* ofxiOSConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxiOSConstants.h; sourceTree = "<group>"; };
@@ -507,8 +503,6 @@
 				678C3D1A176F04F800D1CC68 /* ofxiOSSoundStream.mm */,
 				678C3D1B176F04F800D1CC68 /* ofxiOSSoundStreamDelegate.h */,
 				678C3D1C176F04F800D1CC68 /* ofxiOSSoundStreamDelegate.mm */,
-				66EA462717A6D396009BB12A /* ofxOpenALSoundPlayer.cpp */,
-				66EA462817A6D396009BB12A /* ofxOpenALSoundPlayer.h */,
 				66EA462917A6D396009BB12A /* SoundEngine.cpp */,
 				66EA462A17A6D396009BB12A /* SoundEngine.h */,
 				678C3D1D176F04F800D1CC68 /* SoundInputStream.h */,
@@ -1044,7 +1038,6 @@
 				671C0AF61770246200DF03B3 /* ofxiOSSoundPlayer.h in Headers */,
 				67833F8719F8990D00DBE7AA /* ofTimer.h in Headers */,
 				67509ABD17979781003A3A29 /* ofXml.h in Headers */,
-				66EA462C17A6D396009BB12A /* ofxOpenALSoundPlayer.h in Headers */,
 				66EA462E17A6D396009BB12A /* SoundEngine.h in Headers */,
 				860B024D17A96D840032B827 /* ofxiOS.h in Headers */,
 			);
@@ -1188,7 +1181,6 @@
 				671C0AF51770246200DF03B3 /* AVSoundPlayer.m in Sources */,
 				671C0AF71770246200DF03B3 /* ofxiOSSoundPlayer.mm in Sources */,
 				67509ABC17979781003A3A29 /* ofXml.cpp in Sources */,
-				66EA462B17A6D396009BB12A /* ofxOpenALSoundPlayer.cpp in Sources */,
 				66EA462D17A6D396009BB12A /* SoundEngine.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
