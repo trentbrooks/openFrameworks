@@ -186,12 +186,30 @@
     [ofxiOSGetGLView() stopAnimation];
 	
 	ofxiOSAlerts.lostFocus();
+	
+	NSLog(@"TB TEST: applicationWillResignActive!");
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     [ofxiOSGetGLView() startAnimation];
 	
 	ofxiOSAlerts.gotFocus();
+	
+	NSLog(@"TB TEST: applicationDidBecomeActive!");
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+	// Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
+	// If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+	
+	NSLog(@"TB TEST: applicationDidEnterBackground!");
+
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+	// Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+	
+	NSLog(@"TB TEST: applicationWillEnterForeground!");
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -200,10 +218,13 @@
     // stop listening for orientation change notifications
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+	
+	NSLog(@"TB TEST: applicationWillTerminate!");
 }
 
 - (void)applicationDidReceiveMemoryWarning:(UIApplication *)application {
 	ofxiOSAlerts.gotMemoryWarning();
+	NSLog(@"TB TEST: memory warning!");
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
